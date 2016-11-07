@@ -17,14 +17,19 @@ var options = {
 };
 
 app.get('/gifs',(req,res) => {
-    options.qs.q = req.query.term;
+    options.qs.q = req.query.text;
     request(options,(err, response, body)=>{
         if(err) throw new Error(error);
         var data = lodash.dropRight(lodash.chain(JSON.parse(body).data)
             .map(x => x.images.downsized.url)
             .shuffle()
             .value(),20);
-        res.send(data);
+        res.send({
+          "text":"suggested gifs for "+options.qs.q,
+          "attachments": lodash.map(data,(d)=>{
+            return {"image_url":d}
+          }),
+        });
     });
 
 });
