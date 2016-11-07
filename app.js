@@ -5,6 +5,9 @@ var express = require('express'),
     request = require('request');
 
 var app = express();
+app.listen(3000,()=>{
+  console.log('listening on 3000')
+});
 app.use(awsServerless.eventContext());
 
 var options = {
