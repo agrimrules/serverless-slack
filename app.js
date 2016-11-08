@@ -15,7 +15,7 @@ app.use(awsServerless.eventContext());
 var options = {
     method:'GET',
     url: 'http://api.giphy.com/v1/gifs/search',
-    qs: { api_key: 'dc6zaTOxFJmzC' }
+    qs: { api_key: 'dc6zaTOxFJmzC', limit: 15 }
 };
 
 app.post('/gifs',(req,res) => {
@@ -25,15 +25,25 @@ app.post('/gifs',(req,res) => {
         var data = lodash.dropRight(lodash.chain(JSON.parse(body).data)
             .map(x => x.images.downsized.url)
             .shuffle()
-            .value(),20);
+            .value(),10);
         res.send({
-          "text":"suggested gifs for "+options.qs.q.replace("%20"," "),
+          "text":"suggested gifs for "+options.qs.q,
           "attachments": lodash.map(data,(d)=>{
-            return {"image_url":d}
+            return {"image_url":d,
+                    "actions":[
+                        { "name": "send",
+                          "type": "button",
+                            "value": d }
+                    ]}
           }),
         });
     });
 
+});
+
+app.post('/respond',(req, res) => {
+    console.log(req.body);
+    res.send(req.body);
 });
 
 module.exports = app;
