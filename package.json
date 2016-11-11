@@ -9,6 +9,7 @@
   "author": "Agrim Asthana (dev@agrimasthana.com)",
   "license": "MIT",
   "dependencies": {
+    "async": "^2.1.2",
     "aws-serverless-express": "^1.2.0",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
