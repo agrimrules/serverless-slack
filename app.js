@@ -4,7 +4,7 @@ var express = require('express'),
     lodash = require('lodash'),
     bodyParser = require('body-parser'),
     awsServerless  =require('aws-serverless-express/middleware'),
-    request = require('request');
+    request = require('request-promise');
 
 var app = express();
 app.listen(3000,()=>{
@@ -22,21 +22,34 @@ var options = {
 app.post('/gifs',(req,res) => {
     console.log(req.body);
     options.qs.q = req.body.text;
-    async.parallel([
-    function(){fetchgifs(req.body.response_url);},
-    function(){ res.send({"text":"looking for gifs about "+req.body.text});}
-    ]);
+    fetchgifs(req.body.response_url).then(()=>{
+        console.log('*****sending response *******');
+        res.send({"text":"Looking for gifs about "+req.body.text});
+    });
+    // async.series([
+    // function(cb){
+    //     fetchgifs(req.body.response_url).then(()=>cb());
+    // },
+    // function(cb){
+    //     console.log('************************ intermediate **********************');
+    //     res.send({"text":"looking for gifs about "+req.body.text});
+    //     cb();
+    // }
+    // ],()=>{
+    //     console.log('************************* Express response *****************');
+        // res.send({"text":"Looking for gufs about "+req.body.text});
+    // });
 });
 
 
 var fetchgifs = function(url){
-    request(options,(err, response, body)=>{
+    return request(options,(err, response, body)=>{
         if(err) throw new Error(error);
         var data = lodash.dropRight(lodash.chain(JSON.parse(body).data)
             .map(x => x.images.downsized.url)
             .shuffle()
             .value(),10);
-        delayed(data,url)
+        delayed(data,url);
     });
 };
 
